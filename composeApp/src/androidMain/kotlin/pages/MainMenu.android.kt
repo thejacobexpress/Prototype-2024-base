@@ -29,6 +29,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import matchData
 import nodes.RootNode
+import nodes.RootNode.NavTarget
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import org.json.JSONException
@@ -79,7 +80,7 @@ actual fun MainMenu(
             colors = ButtonDefaults.buttonColors(containerColor = defaultSecondary),
             contentPadding = PaddingValues(horizontal = 60.dp, vertical = 5.dp),
             onClick = {
-                //TODO switch to your new page here
+                backStack.push(NavTarget.WhichMatchMenu)
             },
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)

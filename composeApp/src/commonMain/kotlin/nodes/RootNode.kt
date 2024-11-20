@@ -44,12 +44,16 @@ class RootNode(
 
         @Parcelize
         data object LoginPage : NavTarget()
+
+        @Parcelize
+        data object WhichMatchMenu : NavTarget()
     }
 
     override fun resolve(interactionTarget: NavTarget, buildContext: BuildContext): Node =
         when (interactionTarget) {
             NavTarget.LoginPage -> LoginNode(buildContext, backStack, scoutName, comp)
             NavTarget.MainMenu -> MainMenuNode(buildContext, backStack, robotStartPosition,scoutName, comp, team)
+            NavTarget.WhichMatchMenu -> WhichMatchMenuNode(buildContext, backStack, scoutName, comp, team)
         }
 
     @Composable
