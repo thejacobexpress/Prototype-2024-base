@@ -24,8 +24,16 @@ actual fun WhichMatchMenu(
     var middleGoalPoints by remember { mutableStateOf(0) }
     var highGoalPoints by remember { mutableStateOf(0) }
     var totalPoints by remember { mutableStateOf(lowGoalPoints+middleGoalPoints+highGoalPoints) }
-    
+
     var dropDownExpanded by remember { mutableStateOf(false) }
+
+    var mountUnmountCheck by remember { mutableStateOf(false) }
+    var fitInBoxCheck by remember { mutableStateOf(false) }
+    var weightCheck by remember { mutableStateOf(false) }
+    var motorCheck by remember { mutableStateOf(false) }
+    var totalBonusPoints by remember { mutableStateOf(0) }
+
+    var bonusDropDownExpanded by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -44,17 +52,20 @@ actual fun WhichMatchMenu(
                 color = getCurrentTheme().onPrimary
             )
 
+            // NEEDS A BUTTON TO EXPAND
             DropDownMenu(
                 expanded = dropDownExpanded,
                 onDismissRequest = {
-                    dropDownExpanded = !dropDownExpanded
-                }
+                    dropDownExpanded = false
+                },
+                PopupProperties = PopupProperties(focusable = true)
             ) {
                 
                 DropDownMenuItem(
                     text = { "BlackRock" }
                     onClick = {
 
+                        dropDownExpanded = false
                     }
                 )
 
@@ -62,6 +73,7 @@ actual fun WhichMatchMenu(
                     text = { "Vanguard" }
                     onClick = {
 
+                        dropDownExpanded = false
                     }
                 )
 
@@ -69,6 +81,7 @@ actual fun WhichMatchMenu(
                     text = { "Fidelity" }
                     onClick = {
 
+                        dropDownExpanded = false
                     }
                 )
 
@@ -76,6 +89,7 @@ actual fun WhichMatchMenu(
                     text = { "JPMorgan" }
                     onClick = {
 
+                        dropDownExpanded = false
                     }
                 )
 
@@ -83,6 +97,7 @@ actual fun WhichMatchMenu(
                     text = { "State Street" }
                     onClick = {
 
+                        dropDownExpanded = false
                     }
                 )
                 
@@ -203,6 +218,132 @@ actual fun WhichMatchMenu(
                 text = "Total points the team scored: $totalPoints"
                 color = defaultOnPrimary
             )
+            
+        }
+
+        // NEEDS A BUTTON TO EXPAND
+        DropDownMenu(
+            modifier = modifier
+                .padding(top = 50.dp),
+            expanded = bonusDropDownExpanded,
+            onDismissRequest = {
+                bonusDropDownExpanded = false
+            },
+            PopupProperties = PopupProperties(focusable = true)
+        ) {
+            
+            Row(
+                modifier = modifier
+                    .fillMaxSize()
+                horizontalArrangement = Arrangement.Center
+            ) {
+
+                Text(
+                    text = "Does the team's robot mount and unmount in under 3 minutes?"
+                    color = defaultOnPrimary
+                )
+            
+                CheckBox(
+                    checked = mountUnmountCheck
+                    onCheckedChange = { it ->
+                        mountUnmountCheck = it
+                        if(mountUnmountCheck) {
+                            totalBonusPoints += 5
+                        } else {
+                            totalBonusPoints -= 5
+                        }
+                    }
+                )
+            
+            }
+
+            Row(
+                modifier = modifier
+                    .fillMaxSize(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+    
+                Text(
+                    text = "Does the team's robot fit in a 16\"x16\"x14\" box?"
+                    color = defaultOnPrimary
+                )
+    
+                CheckBox(
+                    checked = fitInBoxCheck
+                    onCheckedChange = { it ->
+                        fitInBoxCheck = it
+                        if(fitInBoxCheck) {
+                            totalBonusPoints += 5
+                        } else {
+                            totalBonusPoints -= 5
+                        }
+                    }
+                )
+                
+            }
+    
+            Row(
+                modifier = modifier
+                    .fillMaxSize(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+    
+                Text(
+                    text = "Does the team's robot weigh less than 7.5 pounds?"
+                    color = defaultOnPrimary
+                )
+    
+                CheckBox(
+                    checked = weightCheck
+                    onCheckedChange = { it ->
+                        weightCheck = it
+                        if(weightCheck) {
+                            totalBonusPoints += 5
+                        } else {
+                            totalBonusPoints -= 5
+                        }
+                    }
+                )
+                
+            }
+    
+            Row(
+                modifier = modifier
+                    .fillMaxSize(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+    
+                Text(
+                    text = "Does the team's robot use one or fewer motors?"
+                    color = defaultOnPrimary
+                )
+    
+                CheckBox(
+                    checked = motorCheck
+                    onCheckedChange = { it ->
+                        motorCheck = it
+                        if(motorCheck) {
+                            totalBonusPoints += 5
+                        } else {
+                            totalBonusPoints -= 5
+                        }
+                    }
+                )
+                
+            }
+    
+            Row(
+                modifier = modifier
+                    .fillMaxSize(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+    
+                Text(
+                    text = "Total bonus points the team scored: $totalBonusPoints"
+                    color = defaultOnPrimary
+                )
+                
+            }
             
         }
         
