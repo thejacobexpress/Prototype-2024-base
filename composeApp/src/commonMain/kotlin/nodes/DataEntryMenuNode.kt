@@ -7,10 +7,9 @@ import androidx.compose.ui.Modifier
 import com.bumble.appyx.components.backstack.BackStack
 import com.bumble.appyx.navigation.modality.BuildContext
 import com.bumble.appyx.navigation.node.Node
-import pages.LoginMenu
-import pages.WhichMatchMenu
+import pages.DataEntryMenu
 
-class WhichMatchMenuNode(
+class DataEntryMenuNode(
     buildContext: BuildContext,
     private val backStack: BackStack<RootNode.NavTarget>,
     private val scoutName: MutableState<String>,
@@ -19,7 +18,7 @@ class WhichMatchMenuNode(
     ) : Node(buildContext) {
         @Composable
         override fun View(modifier: Modifier) {
-            WhichMatchMenu(modifier, backStack, scoutName, comp, team)
+            DataEntryMenu(modifier, backStack, scoutName, comp, team)
         }
 
 

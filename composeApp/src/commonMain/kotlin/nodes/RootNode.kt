@@ -7,7 +7,6 @@ import androidx.compose.ui.Modifier
 import com.bumble.appyx.components.backstack.BackStack
 import com.bumble.appyx.components.backstack.BackStackModel
 import androidx.compose.runtime.*
-import androidx.compose.ui.state.ToggleableState
 import com.bumble.appyx.components.backstack.ui.fader.BackStackFader
 import com.bumble.appyx.navigation.composable.AppyxComponent
 import com.bumble.appyx.navigation.modality.BuildContext
@@ -15,8 +14,6 @@ import com.bumble.appyx.navigation.node.Node
 import com.bumble.appyx.navigation.node.ParentNode
 import com.bumble.appyx.utils.multiplatform.Parcelable
 import com.bumble.appyx.utils.multiplatform.Parcelize
-import pages.*
-import java.lang.Integer.parseInt
 
 
 class RootNode(
@@ -46,14 +43,14 @@ class RootNode(
         data object LoginPage : NavTarget()
 
         @Parcelize
-        data object WhichMatchMenu : NavTarget()
+        data object DataEntryMenu : NavTarget()
     }
 
     override fun resolve(interactionTarget: NavTarget, buildContext: BuildContext): Node =
         when (interactionTarget) {
             NavTarget.LoginPage -> LoginNode(buildContext, backStack, scoutName, comp)
             NavTarget.MainMenu -> MainMenuNode(buildContext, backStack, robotStartPosition,scoutName, comp, team)
-            NavTarget.WhichMatchMenu -> WhichMatchMenuNode(buildContext, backStack, scoutName, comp, team)
+            NavTarget.DataEntryMenu -> DataEntryMenuNode(buildContext, backStack, scoutName, comp, team)
         }
 
     @Composable

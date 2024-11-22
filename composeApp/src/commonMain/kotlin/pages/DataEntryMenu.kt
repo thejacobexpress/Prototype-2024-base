@@ -8,7 +8,7 @@ import com.bumble.appyx.components.backstack.BackStack
 import nodes.RootNode
 
 @Composable
-expect fun WhichMatchMenu(
+expect fun DataEntryMenu(
     modifier: Modifier,
     backStack: BackStack<RootNode.NavTarget>,
     scoutName: MutableState<String>,
