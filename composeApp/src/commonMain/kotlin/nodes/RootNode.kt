@@ -44,6 +44,9 @@ class RootNode(
 
         @Parcelize
         data object DataEntryMenu : NavTarget()
+
+        @Parcelize
+        data object CompareDataMenu : NavTarget()
     }
 
     override fun resolve(interactionTarget: NavTarget, buildContext: BuildContext): Node =
@@ -51,6 +54,7 @@ class RootNode(
             NavTarget.LoginPage -> LoginNode(buildContext, backStack, scoutName, comp)
             NavTarget.MainMenu -> MainMenuNode(buildContext, backStack, robotStartPosition,scoutName, comp, team)
             NavTarget.DataEntryMenu -> DataEntryMenuNode(buildContext, backStack, scoutName, comp, team)
+            NavTarget.CompareDataMenu -> CompareDataMenuNode(buildContext, backStack, scoutName, comp, team)
         }
 
     @Composable

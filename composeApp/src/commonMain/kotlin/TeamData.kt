@@ -3,19 +3,19 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 
-var teamDatas : MutableState<List<TeamData>> = mutableStateOf(List<TeamData>(size = 5){
-    TeamData(mutableStateOf("BlackRock"), mutableStateOf(false), mutableStateOf(""), mutableStateOf(""), mutableStateOf(""), mutableIntStateOf(0), mutableIntStateOf(0), mutableStateOf(false),
-        mutableStateOf(false), mutableStateOf(false), mutableStateOf(false), mutableIntStateOf(0));
+val teamDatas : MutableState<List<TeamData>> = mutableStateOf(listOf(
+    TeamData(mutableStateOf("BlackRock"),mutableStateOf(false), mutableStateOf(""), mutableStateOf(""), mutableStateOf(""), mutableIntStateOf(0), mutableIntStateOf(0), mutableStateOf(false),
+        mutableStateOf(false), mutableStateOf(false), mutableStateOf(false), mutableIntStateOf(0)),
     TeamData(mutableStateOf("Vanguard"), mutableStateOf(false), mutableStateOf(""), mutableStateOf(""), mutableStateOf(""), mutableIntStateOf(0), mutableIntStateOf(0), mutableStateOf(false),
-        mutableStateOf(false), mutableStateOf(false), mutableStateOf(false), mutableIntStateOf(0));
+        mutableStateOf(false), mutableStateOf(false), mutableStateOf(false), mutableIntStateOf(0)),
     TeamData(mutableStateOf("Fidelity"), mutableStateOf(false), mutableStateOf(""), mutableStateOf(""), mutableStateOf(""), mutableIntStateOf(0), mutableIntStateOf(0), mutableStateOf(false),
-        mutableStateOf(false), mutableStateOf(false), mutableStateOf(false), mutableIntStateOf(0));
+        mutableStateOf(false), mutableStateOf(false), mutableStateOf(false), mutableIntStateOf(0)),
     TeamData(mutableStateOf("JPMorgan"), mutableStateOf(false), mutableStateOf(""), mutableStateOf(""), mutableStateOf(""), mutableIntStateOf(0), mutableIntStateOf(0), mutableStateOf(false),
-        mutableStateOf(false), mutableStateOf(false), mutableStateOf(false), mutableIntStateOf(0));
+        mutableStateOf(false), mutableStateOf(false), mutableStateOf(false), mutableIntStateOf(0)),
     TeamData(mutableStateOf("State Street"), mutableStateOf(false), mutableStateOf(""), mutableStateOf(""), mutableStateOf(""), mutableIntStateOf(0), mutableIntStateOf(0), mutableStateOf(false),
-        mutableStateOf(false), mutableStateOf(false), mutableStateOf(false), mutableIntStateOf(0))})
+        mutableStateOf(false), mutableStateOf(false), mutableStateOf(false), mutableIntStateOf(0))))
 
-data class TeamData(
+public data class TeamData(
     val teamName : MutableState<String>,
 
     var hatchPanelCheck : MutableState<Boolean>,
@@ -32,8 +32,6 @@ data class TeamData(
     var totalBonusPoints : MutableIntState
 ) {
 
-    fun getName() : String {
-        return teamName.value
-    }
+
 
 }

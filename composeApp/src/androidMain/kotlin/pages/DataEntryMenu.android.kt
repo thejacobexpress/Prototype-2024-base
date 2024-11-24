@@ -1,22 +1,31 @@
 package pages
 
+import android.graphics.Paint.Align
+import android.provider.DocumentsContract.Root
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bumble.appyx.components.backstack.BackStack
 import com.bumble.appyx.components.backstack.operation.pop
+import com.bumble.appyx.components.backstack.operation.push
 import nodes.RootNode
 import defaultPrimaryVariant
+import defaultSecondary
 import getCurrentTheme
 import teamDatas
 import kotlin.math.floor
@@ -35,15 +44,19 @@ actual fun DataEntryMenu(
     val context = LocalContext.current
 
     var chosenTeamIndex by remember { mutableStateOf(0) }
-    var chosenTeamName by remember { mutableStateOf(teamDatas.value[chosenTeamIndex].getName()) }
+    var chosenTeamName by remember { mutableStateOf(teamDatas.value[chosenTeamIndex].teamName.value) }
 
     var dropDownExpanded by remember { mutableStateOf(false) }
     var bonusDropDownExpanded by remember { mutableStateOf(false) }
 
-    var refreshTotalPoints by remember { mutableStateOf(false) }
+    var refreshtotalPoints by remember { mutableStateOf(false) }
+
+    var bonusPointButtonBorderColor by remember { mutableStateOf(Color.White) }
+    var bonusPointButtonText by remember { mutableStateOf("Reveal bonus point data (OPTIONAL)") }
 
     Column(
-
+        modifier = modifier
+            .verticalScroll(rememberScrollState())
     ) {
 
         Box(
@@ -223,8 +236,8 @@ actual fun DataEntryMenu(
         ) {
 
             Row(
-                modifier = modifier/*
-                .width((LocalConfiguration.current.screenWidthDp * 0.8f).dp)*/,
+                modifier = modifier
+                    .padding(10.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -243,7 +256,8 @@ actual fun DataEntryMenu(
             }
 
             Row(
-                modifier = modifier,
+                modifier = modifier
+                    .padding(10.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -261,7 +275,7 @@ actual fun DataEntryMenu(
                     onValueChange = { it ->
                         if(it.length <= 3) {
                             teamDatas.value[chosenTeamIndex].lowGoalAssets.value = it
-                            refreshTotalPoints = true
+                            refreshtotalPoints = true
                         }
                     }
                 )
@@ -269,7 +283,8 @@ actual fun DataEntryMenu(
             }
 
             Row(
-                modifier = modifier,
+                modifier = modifier
+                    .padding(10.dp),
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -287,7 +302,7 @@ actual fun DataEntryMenu(
                     onValueChange = { it ->
                         if(it.length <= 3) {
                             teamDatas.value[chosenTeamIndex].middleGoalAssets.value = it
-                            refreshTotalPoints = true
+                            refreshtotalPoints = true
                         }
                     }
                 )
@@ -297,7 +312,8 @@ actual fun DataEntryMenu(
             if (teamDatas.value[chosenTeamIndex].hatchPanelCheck.value) {
 
                 Row(
-                    modifier = modifier,
+                    modifier = modifier
+                        .padding(10.dp),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -315,7 +331,7 @@ actual fun DataEntryMenu(
                         onValueChange = { it ->
                             if(it.length <= 3) {
                                 teamDatas.value[chosenTeamIndex].highGoalAssets.value = it
-                                refreshTotalPoints = true
+                                refreshtotalPoints = true
                             }
                         }
                     )
@@ -324,62 +340,63 @@ actual fun DataEntryMenu(
 
             }
 
-            if(refreshTotalPoints) {
+            // Calculates the amount of assets and total points the team scored
+            if(refreshtotalPoints) {
 
                 try {
-                    teamDatas.value[chosenTeamIndex].totalPoints.value = 0
                     teamDatas.value[chosenTeamIndex].totalAssets.value = 0
+                    teamDatas.value[chosenTeamIndex].totalPoints.value = 0
                     if(teamDatas.value[chosenTeamIndex].lowGoalAssets.value != "") {
                         teamDatas.value[chosenTeamIndex].totalAssets.value += teamDatas.value[chosenTeamIndex].lowGoalAssets.value.toInt()
+                        teamDatas.value[chosenTeamIndex].totalPoints.value += teamDatas.value[chosenTeamIndex].lowGoalAssets.value.toInt()*2
                     }
                     if(teamDatas.value[chosenTeamIndex].middleGoalAssets.value != "") {
                         teamDatas.value[chosenTeamIndex].totalAssets.value += teamDatas.value[chosenTeamIndex].middleGoalAssets.value.toInt()
+                        teamDatas.value[chosenTeamIndex].totalPoints.value += teamDatas.value[chosenTeamIndex].middleGoalAssets.value.toInt()*3
                     }
                     if(teamDatas.value[chosenTeamIndex].highGoalAssets.value != "") {
                         teamDatas.value[chosenTeamIndex].totalAssets.value += teamDatas.value[chosenTeamIndex].highGoalAssets.value.toInt()
+                        teamDatas.value[chosenTeamIndex].totalPoints.value += teamDatas.value[chosenTeamIndex].highGoalAssets.value.toInt()*5
                     }
 
+                    // Finds the amount of times the yearly interest and quarterly interest are added to the total amount of points
                     val twelveAssets : Int = floor(teamDatas.value[chosenTeamIndex].totalAssets.value / 12.0).roundToInt()
                     val threeAssets : Int = floor(teamDatas.value[chosenTeamIndex].totalAssets.value / 3.0).roundToInt()
 
-                    // FIX THE USER NEEDING TO INPUT BOTH LOW AND MIDDLE ASSETS, THEY SHOULD ONLY HAVE TO INPUT ONE AMOUNT OF ASSETS
-                    if(teamDatas.value[chosenTeamIndex].hatchPanelCheck.value) {
-                        teamDatas.value[chosenTeamIndex].totalPoints.value = (teamDatas.value[chosenTeamIndex].lowGoalAssets.value.toInt()*2) +
-                                (teamDatas.value[chosenTeamIndex].middleGoalAssets.value.toInt()*3) +
-                                (teamDatas.value[chosenTeamIndex].highGoalAssets.value.toInt()*5) + (twelveAssets*100) + (threeAssets*20)
-                    } else {
-                        teamDatas.value[chosenTeamIndex].totalPoints.value = (teamDatas.value[chosenTeamIndex].lowGoalAssets.value.toInt()*2) +
-                                (teamDatas.value[chosenTeamIndex].middleGoalAssets.value.toInt()*3) + (twelveAssets*100) + (threeAssets*20)
-                    }
+                    teamDatas.value[chosenTeamIndex].totalPoints.value += (twelveAssets*100) + (threeAssets*20)
 
                 } catch (e : NumberFormatException) {
                     print(e.stackTraceToString())
                     Toast.makeText(context, "Please enter a number.", Toast.LENGTH_LONG).show()
                 }
 
-                refreshTotalPoints = false
+                refreshtotalPoints = false
             }
 
             Row(
-                modifier = modifier,
+                modifier = modifier
+                    .padding(start = 10.dp, top = 20.dp),
                 horizontalArrangement = Arrangement.Start
             ) {
 
                 Text(
                     text = "Total assets the team scored: ${teamDatas.value[chosenTeamIndex].totalAssets.value}",
-                    color = getCurrentTheme().onPrimary
+                    color = getCurrentTheme().onPrimary,
+                    fontWeight = FontWeight.Bold
                 )
 
             }
 
             Row(
-                modifier = modifier,
+                modifier = modifier
+                    .padding(start = 10.dp),
                 horizontalArrangement = Arrangement.Start
             ) {
 
                 Text(
                     text = "Total points the team scored: ${teamDatas.value[chosenTeamIndex].totalPoints.value}",
-                    color = getCurrentTheme().onPrimary
+                    color = getCurrentTheme().onPrimary,
+                    fontWeight = FontWeight.Bold
                 )
 
             }
@@ -391,12 +408,20 @@ actual fun DataEntryMenu(
                 OutlinedButton (
                     modifier = modifier
                         .scale(1f),
+                    border = BorderStroke(1f.dp, bonusPointButtonBorderColor),
                     onClick = {
                         bonusDropDownExpanded = !bonusDropDownExpanded
+                        if(bonusDropDownExpanded) {
+                            bonusPointButtonBorderColor = Color.Yellow
+                            bonusPointButtonText = "Hide bonus point data (OPTIONAL)"
+                        } else {
+                            bonusPointButtonBorderColor = Color.White
+                            bonusPointButtonText = "Reveal bonus point data (OPTIONAL)"
+                        }
                     }
                 ) {
                     Text(
-                        text = "Input bonus point data (OPTIONAL)",
+                        text = bonusPointButtonText,
                         color = getCurrentTheme().onPrimary
                     )
                 }
@@ -405,131 +430,172 @@ actual fun DataEntryMenu(
 
                     Column(
                         modifier = modifier
-                            .padding(20.dp)
-                            .border(BorderStroke(3.dp, getCurrentTheme().onSurface))
+//                            .border(BorderStroke(3.dp, getCurrentTheme().onSurface))
                     ) {
-                        Row(
-                            modifier = modifier,
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
+
+                        Column(
+                            modifier = modifier
+                                .padding(10.dp)
+                                .border(BorderStroke(3.dp, getCurrentTheme().onSurface))
                         ) {
 
-                            Text(
+                            Column(
                                 modifier = modifier
-                                    .width((LocalConfiguration.current.screenWidthDp * 0.8f).dp),
-                                text = "Does the team's robot mount and unmount in under 3 minutes?",
-                                color = getCurrentTheme().onPrimary
-                            )
+                                    .padding(10.dp)
+                            ) {
+                                Row(
+                                    modifier = modifier,
+                                    horizontalArrangement = Arrangement.Center,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
 
-                            Checkbox(
-                                checked = teamDatas.value[chosenTeamIndex].mountUnmountCheck.value,
-                                onCheckedChange = { it ->
-                                    teamDatas.value[chosenTeamIndex].mountUnmountCheck.value = it
-                                    if (teamDatas.value[chosenTeamIndex].mountUnmountCheck.value) {
-                                        teamDatas.value[chosenTeamIndex].totalBonusPoints.value += 5
-                                    } else {
-                                        teamDatas.value[chosenTeamIndex].totalBonusPoints.value -= 5
-                                    }
+                                    Text(
+                                        modifier = modifier
+                                            .width((LocalConfiguration.current.screenWidthDp * 0.8f).dp),
+                                        text = "Does the robot mount and unmount in under 3 minutes?",
+                                        color = getCurrentTheme().onPrimary
+                                    )
+
+                                    Checkbox(
+                                        checked = teamDatas.value[chosenTeamIndex].mountUnmountCheck.value,
+                                        onCheckedChange = { it ->
+                                            teamDatas.value[chosenTeamIndex].mountUnmountCheck.value = it
+                                            if (teamDatas.value[chosenTeamIndex].mountUnmountCheck.value) {
+                                                teamDatas.value[chosenTeamIndex].totalBonusPoints.value += 5
+                                            } else {
+                                                teamDatas.value[chosenTeamIndex].totalBonusPoints.value -= 5
+                                            }
+                                        }
+                                    )
+
                                 }
-                            )
 
-                        }
+                                Row(
+                                    modifier = modifier,
+                                    horizontalArrangement = Arrangement.Center,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
 
-                        Row(
-                            modifier = modifier,
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
+                                    Text(
+                                        modifier = modifier
+                                            .width((LocalConfiguration.current.screenWidthDp * 0.8f).dp),
+                                        text = "Does the robot fit in a 16\"x16\"x14\" box?",
+                                        color = getCurrentTheme().onPrimary
+                                    )
 
-                            Text(
-                                modifier = modifier
-                                    .width((LocalConfiguration.current.screenWidthDp * 0.8f).dp),
-                                text = "Does the team's robot fit in a 16\"x16\"x14\" box?",
-                                color = getCurrentTheme().onPrimary
-                            )
+                                    Checkbox(
+                                        checked = teamDatas.value[chosenTeamIndex].fitInBoxCheck.value,
+                                        onCheckedChange = { it ->
+                                            teamDatas.value[chosenTeamIndex].fitInBoxCheck.value = it
+                                            if(teamDatas.value[chosenTeamIndex].fitInBoxCheck.value) {
+                                                teamDatas.value[chosenTeamIndex].totalBonusPoints.value += 5
+                                            } else {
+                                                teamDatas.value[chosenTeamIndex].totalBonusPoints.value -= 5
+                                            }
+                                        }
+                                    )
 
-                            Checkbox(
-                                checked = teamDatas.value[chosenTeamIndex].fitInBoxCheck.value,
-                                onCheckedChange = { it ->
-                                    teamDatas.value[chosenTeamIndex].fitInBoxCheck.value = it
-                                    if(teamDatas.value[chosenTeamIndex].fitInBoxCheck.value) {
-                                        teamDatas.value[chosenTeamIndex].totalBonusPoints.value += 5
-                                    } else {
-                                        teamDatas.value[chosenTeamIndex].totalBonusPoints.value -= 5
-                                    }
                                 }
-                            )
 
-                        }
+                                Row(
+                                    modifier = modifier,
+                                    horizontalArrangement = Arrangement.Center,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
 
-                        Row(
-                            modifier = modifier,
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
+                                    Text(
+                                        modifier = modifier
+                                            .width((LocalConfiguration.current.screenWidthDp * 0.8f).dp),
+                                        text = "Does the robot weigh less than 7.5 pounds?",
+                                        color = getCurrentTheme().onPrimary
+                                    )
 
-                            Text(
-                                modifier = modifier
-                                    .width((LocalConfiguration.current.screenWidthDp * 0.8f).dp),
-                                text = "Does the team's robot weigh less than 7.5 pounds?",
-                                color = getCurrentTheme().onPrimary
-                            )
+                                    Checkbox(
+                                        checked = teamDatas.value[chosenTeamIndex].weightCheck.value,
+                                        onCheckedChange = { it ->
+                                            teamDatas.value[chosenTeamIndex].weightCheck.value = it
+                                            if(teamDatas.value[chosenTeamIndex].weightCheck.value) {
+                                                teamDatas.value[chosenTeamIndex].totalBonusPoints.value += 5
+                                            } else {
+                                                teamDatas.value[chosenTeamIndex].totalBonusPoints.value -= 5
+                                            }
+                                        }
+                                    )
 
-                            Checkbox(
-                                checked = teamDatas.value[chosenTeamIndex].weightCheck.value,
-                                onCheckedChange = { it ->
-                                    teamDatas.value[chosenTeamIndex].weightCheck.value = it
-                                    if(teamDatas.value[chosenTeamIndex].weightCheck.value) {
-                                        teamDatas.value[chosenTeamIndex].totalBonusPoints.value += 5
-                                    } else {
-                                        teamDatas.value[chosenTeamIndex].totalBonusPoints.value -= 5
-                                    }
                                 }
-                            )
 
-                        }
+                                Row(
+                                    modifier = modifier,
+                                    horizontalArrangement = Arrangement.Center,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
 
-                        Row(
-                            modifier = modifier,
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
+                                    Text(
+                                        modifier = modifier
+                                            .width((LocalConfiguration.current.screenWidthDp * 0.8f).dp),
+                                        text = "Does the robot use one or fewer motors?",
+                                        color = getCurrentTheme().onPrimary
+                                    )
 
-                            Text(
-                                modifier = modifier
-                                    .width((LocalConfiguration.current.screenWidthDp * 0.8f).dp),
-                                text = "Does the team's robot use one or fewer motors?",
-                                color = getCurrentTheme().onPrimary
-                            )
+                                    Checkbox(
+                                        checked = teamDatas.value[chosenTeamIndex].motorCheck.value,
+                                        onCheckedChange = { it ->
+                                            teamDatas.value[chosenTeamIndex].motorCheck.value = it
+                                            if(teamDatas.value[chosenTeamIndex].motorCheck.value) {
+                                                teamDatas.value[chosenTeamIndex].totalBonusPoints.value += 5
+                                            } else {
+                                                teamDatas.value[chosenTeamIndex].totalBonusPoints.value -= 5
+                                            }
+                                        }
+                                    )
 
-                            Checkbox(
-                                checked = teamDatas.value[chosenTeamIndex].motorCheck.value,
-                                onCheckedChange = { it ->
-                                    teamDatas.value[chosenTeamIndex].motorCheck.value = it
-                                    if(teamDatas.value[chosenTeamIndex].motorCheck.value) {
-                                        teamDatas.value[chosenTeamIndex].totalBonusPoints.value += 5
-                                    } else {
-                                        teamDatas.value[chosenTeamIndex].totalBonusPoints.value -= 5
-                                    }
                                 }
-                            )
+
+                                Row(
+                                    modifier = modifier,
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+
+                                    Text(
+                                        modifier = modifier
+                                            .padding(top = 10.dp)
+                                            .width((LocalConfiguration.current.screenWidthDp * 0.8f).dp),
+                                        text = "Total bonus points the team scored: ${teamDatas.value[chosenTeamIndex].totalBonusPoints}",
+                                        color = getCurrentTheme().onPrimary,
+                                        fontWeight = FontWeight.Bold
+                                    )
+
+                                }
+                            }
 
                         }
 
-                        Row(
-                            modifier = modifier,
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-
-                            Text(
-                                modifier = modifier
-                                    .width((LocalConfiguration.current.screenWidthDp * 0.8f).dp),
-                                text = "Total bonus points the team scored: ${teamDatas.value[chosenTeamIndex].totalBonusPoints.value}",
-                                color = getCurrentTheme().onPrimary
-                            )
-
-                        }
                     }
+
+                }
+
+            }
+
+            Column(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(top = 15.dp, bottom = 30.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                OutlinedButton(
+                    border = BorderStroke(3.dp, Color.Yellow),
+                    shape = RoundedCornerShape(25.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = defaultSecondary),
+                    onClick = {
+                        backStack.push(RootNode.NavTarget.CompareDataMenu)
+                    }
+                ) {
+
+                    Text(
+                        text = "Compare data",
+                        color = getCurrentTheme().onPrimary
+                    )
 
                 }
 
