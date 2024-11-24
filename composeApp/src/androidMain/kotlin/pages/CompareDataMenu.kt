@@ -56,13 +56,6 @@ actual fun CompareDataMenu(
 
     val context = LocalContext.current
 
-    var orderedTeamList : MutableState<List<TeamData>> = remember { mutableStateOf(listOf()) }
-    if(orderedTeamList.value.size != 5) {
-        for(team in teamDatas.value) {
-            orderedTeamList.value += team
-        }
-    }
-
     var teamValues : MutableState<List<Any>> = remember { mutableStateOf(listOf()) }
 
     var dropDownExpanded by remember { mutableStateOf(false) }
@@ -71,6 +64,43 @@ actual fun CompareDataMenu(
     var chosenFilter by remember { mutableStateOf(false) }
 
     var teamNameText by remember { mutableStateOf("") }
+
+    var firstTimeBooting by remember { mutableStateOf(true) }
+
+    // Need to add each team individually because orderedTeamList just references the location of teamDatas.value if I do orderedTeamList = teamDatas.value!
+    var orderedTeamList : MutableState<List<TeamData>> = remember { mutableStateOf(listOf()) }
+    if(orderedTeamList.value.size != 5) {
+        for(team in teamDatas.value) {
+            orderedTeamList.value += team
+        }
+    }
+
+    // Since "Hatch Panel Check" is the initial value in the dropdown when the user enters the page, the logic for ranking each team in regard to "Hatch Panel Check" must be run.
+    if(firstTimeBooting) {
+        for(team in orderedTeamList.value) {
+            orderedTeamList.value -= team
+        }
+        for(value in teamValues.value) {
+            teamValues.value -= value
+        }
+
+        var teams = teamDatas.value
+
+        for(team in teams) {
+            if(team.hatchPanelCheck.value) {
+                orderedTeamList.value += team
+                teamValues.value += (team.hatchPanelCheck.value)
+                teams -= (team)
+            }
+        }
+        for(team in teams) {
+            orderedTeamList.value += (team)
+            teamValues.value += (team.hatchPanelCheck.value)
+        }
+        firstTimeBooting = false
+    }
+
+    chosenFilter = true
 
     Column(
         modifier = modifier
@@ -205,6 +235,22 @@ actual fun CompareDataMenu(
                                 teamValues.value -= value
                             }
 
+                            var teams = teamDatas.value
+
+                            var totalLowAssetOfTeams : List<Int> = listOf(teams[0].getLowGoalAssets(), teams[1].getLowGoalAssets(),
+                                teams[2].getLowGoalAssets(), teams[3].getLowGoalAssets(), teams[4].getLowGoalAssets()) as? List<Int> ?: listOf()
+
+                            for(lowAssets in totalLowAssetOfTeams) {
+                                teamValues.value += totalLowAssetOfTeams.max()
+                                for(team in teams) {
+                                    if(team.getLowGoalAssets() == totalLowAssetOfTeams.max()) {
+                                        orderedTeamList.value += team
+                                        teams -= team
+                                        break
+                                    }
+                                }
+                                totalLowAssetOfTeams -= totalLowAssetOfTeams.max()
+                            }
 
                             dropDownExpanded = false
 
@@ -234,6 +280,23 @@ actual fun CompareDataMenu(
                                 teamValues.value -= value
                             }
 
+                            var teams = teamDatas.value
+
+                            var totalMiddleAssetOfTeams : List<Int> = listOf(teams[0].getMiddleGoalAssets(), teams[1].getMiddleGoalAssets(),
+                                teams[2].getMiddleGoalAssets(), teams[3].getMiddleGoalAssets(), teams[4].getMiddleGoalAssets()) as? List<Int> ?: listOf()
+
+                            for(middleAssets in totalMiddleAssetOfTeams) {
+                                teamValues.value += totalMiddleAssetOfTeams.max()
+                                for(team in teams) {
+                                    if(team.getMiddleGoalAssets() == totalMiddleAssetOfTeams.max()) {
+                                        orderedTeamList.value += team
+                                        teams -= team
+                                        break
+                                    }
+                                }
+                                totalMiddleAssetOfTeams -= totalMiddleAssetOfTeams.max()
+                            }
+
 
                             dropDownExpanded = false
 
@@ -261,6 +324,23 @@ actual fun CompareDataMenu(
                             }
                             for(value in teamValues.value) {
                                 teamValues.value -= value
+                            }
+
+                            var teams = teamDatas.value
+
+                            var totalHighAssetOfTeams : List<Int> = listOf(teams[0].getHighGoalAssets(), teams[1].getHighGoalAssets(),
+                                teams[2].getHighGoalAssets(), teams[3].getHighGoalAssets(), teams[4].getHighGoalAssets()) as? List<Int> ?: listOf()
+
+                            for(highAssets in totalHighAssetOfTeams) {
+                                teamValues.value += totalHighAssetOfTeams.max()
+                                for(team in teams) {
+                                    if(team.getHighGoalAssets() == totalHighAssetOfTeams.max()) {
+                                        orderedTeamList.value += team
+                                        teams -= team
+                                        break
+                                    }
+                                }
+                                totalHighAssetOfTeams -= totalHighAssetOfTeams.max()
                             }
 
 
@@ -293,6 +373,22 @@ actual fun CompareDataMenu(
                                 teamValues.value -= value
                             }
 
+                            var teams = teamDatas.value
+
+                            var totalAssetOfTeams : List<Int> = listOf(teams[0].totalAssets.intValue, teams[1].totalAssets.intValue,
+                                teams[2].totalAssets.intValue, teams[3].totalAssets.intValue, teams[4].totalAssets.intValue) as? List<Int> ?: listOf()
+
+                            for(totalAssets in totalAssetOfTeams) {
+                                teamValues.value += totalAssetOfTeams.max()
+                                for(team in teams) {
+                                    if(team.totalAssets.value == totalAssetOfTeams.max()) {
+                                        orderedTeamList.value += team
+                                        teams -= team
+                                        break
+                                    }
+                                }
+                                totalAssetOfTeams -= totalAssetOfTeams.max()
+                            }
 
                             dropDownExpanded = false
                             chosenFilter = true
@@ -327,11 +423,15 @@ actual fun CompareDataMenu(
                             var totalPointOfTeams : List<Int> = listOf(teams[0].totalPoints.intValue, teams[1].totalPoints.intValue,
                                 teams[2].totalPoints.intValue, teams[3].totalPoints.intValue, teams[4].totalPoints.intValue) as? List<Int> ?: listOf()
 
-                            for(teamPoints in totalPointOfTeams.sortedDescending()) {
-                                teamValues.value += teamPoints
-                                orderedTeamList.value += teams[0]
-                                teams -= teams[0]
-                                totalPointOfTeams -= teamPoints
+                            for(totalPoints in totalPointOfTeams) {
+                                teamValues.value += totalPointOfTeams.max()
+                                for(team in teams) {
+                                    if(team.totalPoints.value == totalPointOfTeams.max()) {
+                                        orderedTeamList.value += team
+                                        teams -= team
+                                    }
+                                }
+                                totalPointOfTeams -= totalPointOfTeams.max()
                             }
 
                             dropDownExpanded = false
@@ -360,6 +460,20 @@ actual fun CompareDataMenu(
                             }
                             for(value in teamValues.value) {
                                 teamValues.value -= value
+                            }
+
+                            var teams = teamDatas.value
+
+                            for(team in teams) {
+                                if(team.mountUnmountCheck.value) {
+                                    orderedTeamList.value += team
+                                    teamValues.value += (team.mountUnmountCheck.value)
+                                    teams -= (team)
+                                }
+                            }
+                            for(team in teams) {
+                                orderedTeamList.value += (team)
+                                teamValues.value += (team.mountUnmountCheck.value)
                             }
 
 
@@ -391,6 +505,20 @@ actual fun CompareDataMenu(
                                 teamValues.value -= value
                             }
 
+                            var teams = teamDatas.value
+
+                            for(team in teams) {
+                                if(team.fitInBoxCheck.value) {
+                                    orderedTeamList.value += team
+                                    teamValues.value += (team.fitInBoxCheck.value)
+                                    teams -= (team)
+                                }
+                            }
+                            for(team in teams) {
+                                orderedTeamList.value += (team)
+                                teamValues.value += (team.fitInBoxCheck.value)
+                            }
+
 
                             dropDownExpanded = false
 
@@ -418,6 +546,20 @@ actual fun CompareDataMenu(
                             }
                             for(value in teamValues.value) {
                                 teamValues.value -= value
+                            }
+
+                            var teams = teamDatas.value
+
+                            for(team in teams) {
+                                if(team.weightCheck.value) {
+                                    orderedTeamList.value += team
+                                    teamValues.value += (team.weightCheck.value)
+                                    teams -= (team)
+                                }
+                            }
+                            for(team in teams) {
+                                orderedTeamList.value += (team)
+                                teamValues.value += (team.weightCheck.value)
                             }
 
 
@@ -449,6 +591,20 @@ actual fun CompareDataMenu(
                                 teamValues.value -= value
                             }
 
+                            var teams = teamDatas.value
+
+                            for(team in teams) {
+                                if(team.motorCheck.value) {
+                                    orderedTeamList.value += team
+                                    teamValues.value += (team.motorCheck.value)
+                                    teams -= (team)
+                                }
+                            }
+                            for(team in teams) {
+                                orderedTeamList.value += (team)
+                                teamValues.value += (team.motorCheck.value)
+                            }
+
                             dropDownExpanded = false
 
                             chosenFilter = true
@@ -477,6 +633,22 @@ actual fun CompareDataMenu(
                                 teamValues.value -= value
                             }
 
+                            var teams = teamDatas.value
+
+                            var totalBonusPointOfTeams : List<Int> = listOf(teams[0].totalBonusPoints.intValue, teams[1].totalBonusPoints.intValue,
+                                teams[2].totalBonusPoints.intValue, teams[3].totalBonusPoints.intValue, teams[4].totalBonusPoints.intValue) as? List<Int> ?: listOf()
+
+                            for(totalAssets in totalBonusPointOfTeams) {
+                                teamValues.value += totalBonusPointOfTeams.max()
+                                for(team in teams) {
+                                    if(team.totalBonusPoints.value == totalBonusPointOfTeams.max()) {
+                                        orderedTeamList.value += team
+                                        teams -= team
+                                        break
+                                    }
+                                }
+                                totalBonusPointOfTeams -= totalBonusPointOfTeams.max()
+                            }
 
                             dropDownExpanded = false
 
@@ -495,13 +667,13 @@ actual fun CompareDataMenu(
 
             Row(
                 modifier = modifier
-                    .padding(50.dp)
+                    .padding(top = 50.dp)
             ) {
 
                 Column(
                     modifier = modifier
-                        .width((LocalConfiguration.current.screenWidthDp * 0.5f).dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .padding(end = 25.dp),
+                    horizontalAlignment = Alignment.End
                 ) {
 
                     for(team in orderedTeamList.value) {
@@ -523,8 +695,8 @@ actual fun CompareDataMenu(
 
                 Column(
                     modifier = modifier
-                        .width((LocalConfiguration.current.screenWidthDp * 0.5f).dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .padding(start = 25.dp),
+                    horizontalAlignment = Alignment.Start
                 ) {
 
                     if(chosenFilter) {

@@ -32,6 +32,28 @@ public data class TeamData(
     var totalBonusPoints : MutableIntState
 ) {
 
+    fun getLowGoalAssets() : Int {
+        if(lowGoalAssets.value == "") {
+            return 0
+        } else {
+            return lowGoalAssets.value.toInt()
+        }
+    }
 
+    fun getMiddleGoalAssets() : Int {
+        if(middleGoalAssets.value == "") {
+            return 0
+        } else {
+            return middleGoalAssets.value.toInt()
+        }
+    }
+
+    fun getHighGoalAssets() : Int {
+        if(highGoalAssets.value == "") {
+            return 0
+        } else {
+            return highGoalAssets.value.toInt()
+        }
+    }
 
 }

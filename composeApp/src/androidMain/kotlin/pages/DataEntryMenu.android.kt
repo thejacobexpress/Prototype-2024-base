@@ -407,7 +407,8 @@ actual fun DataEntryMenu(
             ) {
                 OutlinedButton (
                     modifier = modifier
-                        .scale(1f),
+                        .scale(1f)
+                        .padding(start = 10.dp),
                     border = BorderStroke(1f.dp, bonusPointButtonBorderColor),
                     onClick = {
                         bonusDropDownExpanded = !bonusDropDownExpanded
@@ -560,7 +561,7 @@ actual fun DataEntryMenu(
                                         modifier = modifier
                                             .padding(top = 10.dp)
                                             .width((LocalConfiguration.current.screenWidthDp * 0.8f).dp),
-                                        text = "Total bonus points the team scored: ${teamDatas.value[chosenTeamIndex].totalBonusPoints}",
+                                        text = "Total bonus points the team scored: ${teamDatas.value[chosenTeamIndex].totalBonusPoints.value}",
                                         color = getCurrentTheme().onPrimary,
                                         fontWeight = FontWeight.Bold
                                     )
