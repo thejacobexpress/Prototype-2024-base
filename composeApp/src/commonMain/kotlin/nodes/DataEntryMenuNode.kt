@@ -11,14 +11,11 @@ import pages.DataEntryMenu
 
 class DataEntryMenuNode(
     buildContext: BuildContext,
-    private val backStack: BackStack<RootNode.NavTarget>,
-    private val scoutName: MutableState<String>,
-    private val comp: MutableState<String>,
-    private val team: MutableIntState
+    private val backStack: BackStack<RootNode.NavTarget>
     ) : Node(buildContext) {
         @Composable
         override fun View(modifier: Modifier) {
-            DataEntryMenu(modifier, backStack, scoutName, comp, team)
+            DataEntryMenu(modifier, backStack)
         }
 
 

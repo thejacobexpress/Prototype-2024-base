@@ -53,8 +53,8 @@ class RootNode(
         when (interactionTarget) {
             NavTarget.LoginPage -> LoginNode(buildContext, backStack, scoutName, comp)
             NavTarget.MainMenu -> MainMenuNode(buildContext, backStack, robotStartPosition,scoutName, comp, team)
-            NavTarget.DataEntryMenu -> DataEntryMenuNode(buildContext, backStack, scoutName, comp, team)
-            NavTarget.CompareDataMenu -> CompareDataMenuNode(buildContext, backStack, scoutName, comp, team)
+            NavTarget.DataEntryMenu -> DataEntryMenuNode(buildContext, backStack)
+            NavTarget.CompareDataMenu -> CompareDataMenuNode(buildContext, backStack)
         }
 
     @Composable

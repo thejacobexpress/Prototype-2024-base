@@ -10,8 +10,5 @@ import nodes.RootNode
 @Composable
 expect fun DataEntryMenu(
     modifier: Modifier,
-    backStack: BackStack<RootNode.NavTarget>,
-    scoutName: MutableState<String>,
-    comp: MutableState<String>,
-    team: MutableIntState
+    backStack: BackStack<RootNode.NavTarget>
 )

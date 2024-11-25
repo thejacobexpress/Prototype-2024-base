@@ -32,8 +32,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bumble.appyx.components.backstack.BackStack
@@ -48,10 +50,7 @@ import teamDatas
 @Composable
 actual fun CompareDataMenu(
     modifier: Modifier,
-    backStack: BackStack<RootNode.NavTarget>,
-    scoutName: MutableState<String>,
-    comp: MutableState<String>,
-    team: MutableIntState
+    backStack: BackStack<RootNode.NavTarget>
 ) {
 
     val context = LocalContext.current
@@ -61,7 +60,6 @@ actual fun CompareDataMenu(
     var dropDownExpanded by remember { mutableStateOf(false) }
 
     var chosenFilterText by remember { mutableStateOf("Hatch Panel Check") }
-    var chosenFilter by remember { mutableStateOf(false) }
 
     var teamNameText by remember { mutableStateOf("") }
 
@@ -100,7 +98,7 @@ actual fun CompareDataMenu(
         firstTimeBooting = false
     }
 
-    chosenFilter = true
+    
 
     Column(
         modifier = modifier
@@ -163,7 +161,8 @@ actual fun CompareDataMenu(
                     readOnly = true,
                     trailingIcon = {
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropDownExpanded)
-                    }
+                    },
+                    textStyle = TextStyle(color = Color.White)
                 )
 
                 ExposedDropdownMenu(
@@ -185,11 +184,14 @@ actual fun CompareDataMenu(
                             )
                         },
                         onClick = {
+                            // Ranks teams by if they were able to remove the hatch panel or not. If they were able to, the teams are placed at the top of the ranking.
                             chosenFilterText = "Hatch Panel Check"
 
+                            // Clear orderedTeamList so another order of teams can be made from the value the user selected.
                             for(team in orderedTeamList.value) {
                                 orderedTeamList.value -= team
                             }
+                            // Clear teamValues so another type can be added.
                             for(value in teamValues.value) {
                                 teamValues.value -= value
                             }
@@ -208,7 +210,6 @@ actual fun CompareDataMenu(
                                 teamValues.value += (team.hatchPanelCheck.value)
                             }
 
-                            chosenFilter = true
                             dropDownExpanded = false
                         }
                     )
@@ -225,6 +226,7 @@ actual fun CompareDataMenu(
                                 color = getCurrentTheme().onPrimary
                             )
                         },
+                        // Ranks teams' number of total low goal assets scored from greatest to lowest
                         onClick = {
                             chosenFilterText = "Low Goal Assets"
 
@@ -253,8 +255,6 @@ actual fun CompareDataMenu(
                             }
 
                             dropDownExpanded = false
-
-                            chosenFilter = true
                         }
                     )
 
@@ -270,6 +270,7 @@ actual fun CompareDataMenu(
                                 color = getCurrentTheme().onPrimary
                             )
                         },
+                        // Ranks teams' number of total middle goal assets scored from greatest to lowest
                         onClick = {
                             chosenFilterText = "Middle Goal Assets"
 
@@ -299,8 +300,6 @@ actual fun CompareDataMenu(
 
 
                             dropDownExpanded = false
-
-                            chosenFilter = true
                         }
                     )
 
@@ -317,6 +316,7 @@ actual fun CompareDataMenu(
                             )
                         },
                         onClick = {
+                            // Ranks teams' number of total high goal assets scored from greatest to lowest
                             chosenFilterText = "High Goal Assets"
 
                             for(team in orderedTeamList.value) {
@@ -343,10 +343,7 @@ actual fun CompareDataMenu(
                                 totalHighAssetOfTeams -= totalHighAssetOfTeams.max()
                             }
 
-
                             dropDownExpanded = false
-
-                            chosenFilter = true
                         }
                     )
 
@@ -362,7 +359,7 @@ actual fun CompareDataMenu(
                                 color = getCurrentTheme().onPrimary
                             )
                         },
-                        // Ranks teams' number of total points from greatest to lowest
+                        // Ranks teams' number of total assets from greatest to lowest
                         onClick = {
                             chosenFilterText = "Total Assets"
 
@@ -391,7 +388,6 @@ actual fun CompareDataMenu(
                             }
 
                             dropDownExpanded = false
-                            chosenFilter = true
                         }
                     )
 
@@ -407,6 +403,7 @@ actual fun CompareDataMenu(
                                 color = getCurrentTheme().onPrimary
                             )
                         },
+                        // Ranks teams' number of total points from greatest to lowest
                         onClick = {
 
                             chosenFilterText = "Total Points"
@@ -435,8 +432,6 @@ actual fun CompareDataMenu(
                             }
 
                             dropDownExpanded = false
-
-                            chosenFilter = true
                         }
                     )
 
@@ -453,6 +448,7 @@ actual fun CompareDataMenu(
                             )
                         },
                         onClick = {
+                            // Ranks teams by if they were able to mount and unmount their robot from the elevator in under 3 minutes or not. If they were able to, the teams are placed at the top of the ranking.
                             chosenFilterText = "Mount in 3 Minutes"
 
                             for(team in orderedTeamList.value) {
@@ -478,8 +474,6 @@ actual fun CompareDataMenu(
 
 
                             dropDownExpanded = false
-
-                            chosenFilter = true
                         }
                     )
 
@@ -496,6 +490,7 @@ actual fun CompareDataMenu(
                             )
                         },
                         onClick = {
+                            // Ranks teams by if they were able to fit in a 16"x16"x14" box or not. If they were able to, the teams are placed at the top of the ranking.
                             chosenFilterText = "Fits in 16\"x16\"x14\" Box"
 
                             for(team in orderedTeamList.value) {
@@ -521,8 +516,6 @@ actual fun CompareDataMenu(
 
 
                             dropDownExpanded = false
-
-                            chosenFilter = true
                         }
                     )
 
@@ -539,6 +532,7 @@ actual fun CompareDataMenu(
                             )
                         },
                         onClick = {
+                            // Ranks teams by if they weigh under 7.5 pounds or not. If they were able to, the teams are placed at the top of the ranking.
                             chosenFilterText = "Under 7.5 pounds"
 
                             for(team in orderedTeamList.value) {
@@ -564,8 +558,6 @@ actual fun CompareDataMenu(
 
 
                             dropDownExpanded = false
-
-                            chosenFilter = true
                         }
                     )
 
@@ -581,6 +573,7 @@ actual fun CompareDataMenu(
                                 color = getCurrentTheme().onPrimary
                             )
                         },
+                        // Ranks teams by if their robot has one or fewer motors. If they do, the teams are placed at the top of the ranking.
                         onClick = {
                             chosenFilterText = "Has 1 or less Motors"
 
@@ -606,8 +599,6 @@ actual fun CompareDataMenu(
                             }
 
                             dropDownExpanded = false
-
-                            chosenFilter = true
                         }
                     )
 
@@ -623,6 +614,7 @@ actual fun CompareDataMenu(
                                 color = getCurrentTheme().onPrimary
                             )
                         },
+                        // Ranks teams' number of total bonus points from greatest to lowest
                         onClick = {
                             chosenFilterText = "Total Bonus Points"
 
@@ -651,8 +643,6 @@ actual fun CompareDataMenu(
                             }
 
                             dropDownExpanded = false
-
-                            chosenFilter = true
                         }
                     )
 
@@ -676,6 +666,8 @@ actual fun CompareDataMenu(
                     horizontalAlignment = Alignment.End
                 ) {
 
+                    // Displays team names in order of greatest to least in regard to the value the user has selected
+                    // to compare.
                     for(team in orderedTeamList.value) {
 
                         Row(
@@ -699,21 +691,20 @@ actual fun CompareDataMenu(
                     horizontalAlignment = Alignment.Start
                 ) {
 
-                    if(chosenFilter) {
-                        for(teamIndex in teamDatas.value.indices) {
+                    // Displays the value the user has selected to the right of each corresponding team's name.
+                    for(teamIndex in teamDatas.value.indices) {
 
-                            Row(
-                                horizontalArrangement = Arrangement.Center
-                            ) {
+                        Row(
+                            horizontalArrangement = Arrangement.Center
+                        ) {
 
-                                Text(
-                                    text = "${teamValues.value[teamIndex]}",
-                                    color = getCurrentTheme().onPrimary
-                                )
-
-                            }
+                            Text(
+                                text = "${teamValues.value[teamIndex]}",
+                                color = getCurrentTheme().onPrimary
+                            )
 
                         }
+
                     }
 
                 }
